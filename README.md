@@ -225,9 +225,7 @@ A rota raiz da API exibe uma página simples com a lista de áudios armazenados,
 - A aplicação salva dados reais de áudio e metadados em disco e no banco de dados.
 - O token de autenticação deve estar consistente entre o cliente e o servidor.
 
-## Autor
 
-Projeto desenvolvido como atividade prática de arquitetura cliente/servidor em camadas para processamento de áudio.
 
 ## Estrutura do repositório
 
