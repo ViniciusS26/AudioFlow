@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+.env
+.pytest_cache/
+.vscode/
+server/storage/
+client/__pycache__/
+server/app/__pycache__/
+*.log
+tools/
+*.zip
+tools/ffmpeg/
+tools/*.zip
