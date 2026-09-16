@@ -19,7 +19,7 @@ from server.app.storage import (
 )
 
 
-VALID_PROCESSINGS = {'normalize', 'mono', 'speed', 'bitrate', 'format', 'original'}
+VALID_PROCESSINGS = {'normalize', 'mono', 'speed', 'bitrate', 'format', 'original', 'noise_reduce', 'compress', 'fade', 'trim'}
 
 
 def ensure_valid_processing(value: str) -> str:

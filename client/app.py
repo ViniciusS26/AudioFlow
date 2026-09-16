@@ -1,11 +1,13 @@
 import os
 import sys
-import webbrowser
+import tempfile
 from pathlib import Path
 from urllib.parse import urlencode
 
 import requests
 from dotenv import load_dotenv
+from PySide6.QtCore import QUrl
+from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -26,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
 API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost:8000')
-DEFAULT_API_TOKEN = os.getenv('API_TOKEN', 'audio-demo-token')
+DEFAULT_API_TOKEN = os.getenv('API_TOKEN', 'asdefafasfadasdweaw2')
 
 
 class AudioClient(QWidget):
@@ -51,7 +53,10 @@ class AudioClient(QWidget):
         self.token_input.setPlaceholderText('Token do servidor')
 
         self.process_combo = QComboBox()
-        self.process_combo.addItems(['normalize', 'mono', 'speed', 'bitrate', 'format', 'original'])
+        self.process_combo.addItems([
+            'normalize', 'mono', 'speed', 'bitrate', 'format', 'original',
+            'noise_reduce', 'compress', 'fade', 'trim'
+        ])
 
         self.upload_button = QPushButton('Enviar para o servidor')
         self.upload_button.setStyleSheet('background:#2d6cdf; color:white; padding:8px;')
@@ -59,11 +64,19 @@ class AudioClient(QWidget):
         self.meta_label = QLabel('Informações do arquivo:')
         self.meta_label.setStyleSheet('font-weight: bold;')
 
+        self.now_playing_label = QLabel('Nenhum áudio em reprodução')
+        self.now_playing_label.setStyleSheet('font-weight: bold; color: #1f5fbf;')
+
         self.original_button = QPushButton('Reproduzir original')
         self.processed_button = QPushButton('Reproduzir processado')
         self.refresh_button = QPushButton('Atualizar histórico')
 
         self.history_list = QListWidget()
+
+        self.player = QMediaPlayer()
+        self.audio_output = QAudioOutput()
+        self.player.setAudioOutput(self.audio_output)
+        self.audio_output.setVolume(0.8)
 
         form = QFormLayout()
         form.addRow('Arquivo selecionado:', self.path_label)
@@ -84,6 +97,7 @@ class AudioClient(QWidget):
         layout.addLayout(form)
         layout.addLayout(buttons)
         layout.addWidget(self.meta_label)
+        layout.addWidget(self.now_playing_label)
         layout.addLayout(actions)
         layout.addWidget(self.history_list)
         self.setLayout(layout)
@@ -182,10 +196,7 @@ class AudioClient(QWidget):
         if not self.history:
             QMessageBox.warning(self, 'Sem histórico', 'Nenhum áudio foi enviado ainda.')
             return
-        item = self.history[0]
-        params = {'uuid': item['id'], 'token': self.api_token}
-        url = f'{API_BASE_URL}/files/{Path(item["path_original"]).name}?{urlencode(params)}'
-        self.open_url(url)
+        self._play_audio(self.history[0], processed=False)
 
     def play_processed(self):
         if not self.history:
@@ -195,12 +206,31 @@ class AudioClient(QWidget):
         if not item.get('path_processed'):
             QMessageBox.information(self, 'Sem processamento', 'Este áudio não possui versão processada.')
             return
-        params = {'uuid': item['id'], 'token': self.api_token}
-        url = f'{API_BASE_URL}/files/{Path(item["path_processed"]).name}?{urlencode(params)}'
-        self.open_url(url)
+        self._play_audio(item, processed=True)
 
-    def open_url(self, url: str):
-        webbrowser.open(url)
+    def _play_audio(self, item, processed: bool):
+        file_name = Path(item['path_processed']).name if processed else Path(item['path_original']).name
+        params = {'uuid': item['id'], 'token': self.api_token}
+        url = f'{API_BASE_URL}/files/{file_name}?{urlencode(params)}'
+
+        try:
+            response = requests.get(url, timeout=30, stream=True)
+            if response.status_code != 200:
+                QMessageBox.critical(self, 'Erro de autorização', response.text)
+                return
+
+            temp_dir = Path(tempfile.gettempdir())
+            local_path = temp_dir / f"{item['id']}_{file_name}"
+            with open(local_path, 'wb') as f:
+                for chunk in response.iter_content(8192):
+                    if chunk:
+                        f.write(chunk)
+
+            self.now_playing_label.setText(f'Em reprodução: {file_name}')
+            self.player.setSource(QUrl.fromLocalFile(str(local_path)))
+            self.player.play()
+        except Exception as exc:
+            QMessageBox.critical(self, 'Erro ao reproduzir', str(exc))
 
 
 if __name__ == '__main__':

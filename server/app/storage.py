@@ -83,6 +83,14 @@ def process_audio(file_path: str | Path, processing_type: str, output_path: str 
         subprocess.run(['ffmpeg', '-y', '-i', src, '-b:a', '96k', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     elif processing_type == 'format':
         subprocess.run(['ffmpeg', '-y', '-i', src, '-c:a', 'pcm_s16le', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    elif processing_type == 'noise_reduce':
+        subprocess.run(['ffmpeg', '-y', '-i', src, '-af', 'afftdn=nf=-25', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    elif processing_type == 'compress':
+        subprocess.run(['ffmpeg', '-y', '-i', src, '-af', 'compand=0.3|0.3:1|1:-90/-90|-70/-70|-30/-9|0/-5:0:-90:0.2', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    elif processing_type == 'fade':
+        subprocess.run(['ffmpeg', '-y', '-i', src, '-af', 'afade=t=in:st=0:d=1,afade=t=out:st=0:d=1', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    elif processing_type == 'trim':
+        subprocess.run(['ffmpeg', '-y', '-i', src, '-t', '10', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
         shutil.copyfile(src, dst)
 

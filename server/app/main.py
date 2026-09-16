@@ -5,7 +5,7 @@ import uuid as uuid_module
 from pathlib import Path
 from urllib.parse import urlencode
 
-from fastapi import Depends, FastAPI, File, Header, HTTPException, Request, UploadFile
+from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse
 from sqlalchemy.orm import Session
 
@@ -15,7 +15,7 @@ from server.app.models import Audio
 from server.app.schemas import AudioRecord, UploadResponse
 
 app = FastAPI(title="Audio Processing API")
-API_TOKEN = os.getenv("API_TOKEN", "audio-demo-token")
+API_TOKEN = os.getenv("API_TOKEN", "asdefafasfadasdweaw2")
 
 
 def get_db():
@@ -89,7 +89,7 @@ def get_audios(db: Session = Depends(get_db), _: bool = Depends(require_api_key)
 @app.post("/api/upload", response_model=UploadResponse)
 async def upload_audio(
     file: UploadFile = File(...),
-    processing_type: str = 'normalize',
+    processing_type: str = Form('normalize'),
     db: Session = Depends(get_db),
     _: bool = Depends(require_api_key),
 ):
