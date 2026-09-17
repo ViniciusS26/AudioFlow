@@ -26,9 +26,10 @@ from PySide6.QtWidgets import (
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
+load_dotenv(Path(__file__).resolve().parent / '.env', override=True)
 
-API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost:8000')
-DEFAULT_API_TOKEN = os.getenv('API_TOKEN', 'asdefafasfadasdweaw2')
+API_BASE_URL = os.getenv('API_BASE_URL', 'http://127.0.0.1:8000').rstrip('/')
+DEFAULT_API_TOKEN = os.getenv('API_TOKEN', 'audio-demo-token')
 
 
 class AudioClient(QWidget):

@@ -14,8 +14,8 @@ from server.app.database import SessionLocal, init_db
 from server.app.models import Audio
 from server.app.schemas import AudioRecord, UploadResponse
 
-app = FastAPI(title="Audio Processing API")
-API_TOKEN = os.getenv("API_TOKEN", "asdefafasfadasdweaw2")
+app = FastAPI(title=os.getenv("APP_TITLE", "Audio Processing API"))
+API_TOKEN = os.getenv("API_TOKEN", "audio-demo-token")
 
 
 def get_db():

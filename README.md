@@ -136,6 +136,15 @@ pip install -r requirements.txt
 
 O projeto usa um arquivo `.env` com as configurações de banco, token e caminhos do sistema. Ajuste os valores conforme o ambiente local.
 
+Para executar o cliente e o servidor em máquinas diferentes, configure o `.env` da máquina do servidor com `SERVER_HOST=0.0.0.0`, mantenha o banco e o FFmpeg nessa máquina e libere a porta TCP `8000` no firewall. Descubra o IPv4 da máquina do servidor (por exemplo, `192.168.1.50`) e crie `client/.env` na máquina do cliente com:
+
+```env
+API_BASE_URL=http://192.168.1.50:8000
+API_TOKEN=audio-demo-token
+```
+
+O valor de `API_TOKEN` precisa ser igual ao configurado no `.env` do servidor. O cliente só precisa das dependências Python e não precisa ter PostgreSQL, FFmpeg ou a pasta `server/storage`.
+
 ### 5) Inicie o banco de dados
 
 ```bash
@@ -154,6 +163,8 @@ A API ficará disponível em:
 - http://localhost:8000
 - http://localhost:8000/docs
 - http://localhost:8000/api/audios
+
+Em outra máquina da mesma rede, substitua `localhost` pelo IP do servidor, por exemplo `http://192.168.1.50:8000`.
 
 ### 7) Execute o cliente
 

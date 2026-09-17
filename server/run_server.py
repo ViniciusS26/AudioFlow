@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -14,4 +15,8 @@ except ModuleNotFoundError:
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(
+        app,
+        host=os.getenv("SERVER_HOST", "0.0.0.0"),
+        port=int(os.getenv("SERVER_PORT", "8000")),
+    )
