@@ -37,7 +37,8 @@ def save_uploaded_audio(db: Session, upload: UploadFile, processing_type: str) -
     storage_root.mkdir(parents=True, exist_ok=True)
 
     original_path = storage_root / f"audio.{original_ext}"
-    processed_path = storage_root / f"audio_processed.{original_ext}"
+    processed_ext = 'wav' if processing_type == 'format' else original_ext
+    processed_path = storage_root / f"audio_processed.{processed_ext}"
     waveform_path = storage_root / 'waveform.png'
     meta_path = storage_root / 'meta.json'
 

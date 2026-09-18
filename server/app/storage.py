@@ -73,32 +73,38 @@ def generate_waveform(input_audio: str | Path, waveform_path: str | Path) -> Non
 def process_audio(file_path: str | Path, processing_type: str, output_path: str | Path) -> None:
     src = str(file_path)
     dst = str(output_path)
+    ffmpeg = str(Path(settings.FFMPEG_BIN) / 'ffmpeg.exe')
+    if not Path(ffmpeg).exists():
+        ffmpeg = 'ffmpeg'
     if processing_type == 'normalize':
-        subprocess.run(['ffmpeg', '-y', '-i', src, '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([ffmpeg, '-y', '-i', src, '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     elif processing_type == 'mono':
-        subprocess.run(['ffmpeg', '-y', '-i', src, '-ac', '1', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([ffmpeg, '-y', '-i', src, '-ac', '1', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     elif processing_type == 'speed':
-        subprocess.run(['ffmpeg', '-y', '-i', src, '-filter:a', 'atempo=1.25', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([ffmpeg, '-y', '-i', src, '-filter:a', 'atempo=1.25', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     elif processing_type == 'bitrate':
-        subprocess.run(['ffmpeg', '-y', '-i', src, '-b:a', '96k', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([ffmpeg, '-y', '-i', src, '-b:a', '96k', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     elif processing_type == 'format':
-        subprocess.run(['ffmpeg', '-y', '-i', src, '-c:a', 'pcm_s16le', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([ffmpeg, '-y', '-i', src, '-c:a', 'pcm_s16le', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     elif processing_type == 'noise_reduce':
-        subprocess.run(['ffmpeg', '-y', '-i', src, '-af', 'afftdn=nf=-25', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([ffmpeg, '-y', '-i', src, '-af', 'afftdn=nf=-25', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     elif processing_type == 'compress':
-        subprocess.run(['ffmpeg', '-y', '-i', src, '-af', 'compand=0.3|0.3:1|1:-90/-90|-70/-70|-30/-9|0/-5:0:-90:0.2', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([ffmpeg, '-y', '-i', src, '-af', 'compand=0.3|0.3:1|1:-90/-90|-70/-70|-30/-9|0/-5:0:-90:0.2', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     elif processing_type == 'fade':
-        subprocess.run(['ffmpeg', '-y', '-i', src, '-af', 'afade=t=in:st=0:d=1,afade=t=out:st=0:d=1', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([ffmpeg, '-y', '-i', src, '-af', 'afade=t=in:st=0:d=1,afade=t=out:st=0:d=1', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     elif processing_type == 'trim':
-        subprocess.run(['ffmpeg', '-y', '-i', src, '-t', '10', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([ffmpeg, '-y', '-i', src, '-t', '10', dst], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
         shutil.copyfile(src, dst)
 
 
 def get_audio_metadata(path: str | Path) -> dict:
     import json
+    ffprobe = str(Path(settings.FFMPEG_BIN) / 'ffprobe.exe')
+    if not Path(ffprobe).exists():
+        ffprobe = 'ffprobe'
     result = subprocess.run([
-        'ffprobe', '-v', 'error', '-show_entries', 'format=duration,bit_rate:stream=sample_rate,channels,codec_name',
+        ffprobe, '-v', 'error', '-show_entries', 'format=duration,bit_rate:stream=sample_rate,channels,codec_name',
         '-of', 'json', str(path)
     ], capture_output=True, text=True, check=True)
     payload = json.loads(result.stdout)

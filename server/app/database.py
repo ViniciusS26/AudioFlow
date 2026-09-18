@@ -15,7 +15,11 @@ def build_engine():
     if settings.DATABASE_URL.startswith("sqlite"):
         return create_engine(settings.DATABASE_URL, pool_pre_ping=True)
 
-    engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+    engine = create_engine(
+        settings.DATABASE_URL,
+        pool_pre_ping=True,
+        connect_args={'connect_timeout': 5},
+    )
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))

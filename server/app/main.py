@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import uuid as uuid_module
 from pathlib import Path
 from urllib.parse import urlencode
@@ -10,12 +9,13 @@ from fastapi.responses import FileResponse, HTMLResponse
 from sqlalchemy.orm import Session
 
 from server.app.audio_service import list_audios, save_uploaded_audio
+from server.app.config import settings
 from server.app.database import SessionLocal, init_db
 from server.app.models import Audio
 from server.app.schemas import AudioRecord, UploadResponse
 
-app = FastAPI(title=os.getenv("APP_TITLE", "Audio Processing API"))
-API_TOKEN = os.getenv("API_TOKEN", "audio-demo-token")
+app = FastAPI(title=settings.APP_TITLE)
+API_TOKEN = settings.API_TOKEN
 
 
 def get_db():
