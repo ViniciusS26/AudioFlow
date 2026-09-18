@@ -232,6 +232,7 @@ A rota raiz da API exibe uma página simples com a lista de áudios armazenados,
 ## Observações
 
 - O ambiente precisa ter o FFmpeg instalado e acessível no PATH.
+- Download do FFmpeg: https://ffmpeg.org/download.html
 - O PostgreSQL deve estar em execução antes do servidor iniciar.
 - A aplicação salva dados reais de áudio e metadados em disco e no banco de dados.
 - O token de autenticação deve estar consistente entre o cliente e o servidor.
@@ -327,8 +328,3 @@ A seguir estão os principais resultados visuais do sistema em operação:
 ![Histórico e reprodução](docs/screenshots/Captura%20de%20tela%202026-09-16%20125454.png)
 
 Essas imagens demonstram o fluxo completo do projeto: seleção, upload, processamento, armazenamento no servidor e reprodução das versões original e processada.
-## Observações
-
-- O ambiente precisa ter o FFmpeg instalado e acessível no PATH.
-- O PostgreSQL deve estar em execução antes do servidor iniciar.
-- A aplicação salva dados reais de áudio e metadados em disco e no banco de dados.
